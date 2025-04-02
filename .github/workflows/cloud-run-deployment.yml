@@ -1,0 +1,63 @@
+name: Deploy to Cloud Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        default: "stage"
+        type: choice
+        options:
+          - stage
+          - prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }} # Dynamically set the environment
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Verify Authentication
+        run: |
+          gcloud auth list
+          gcloud config get-value project
+
+      - name: Docker Authentication
+        run: |
+          gcloud auth configure-docker gcr.io --quiet
+
+      - name: Build and push Docker image
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          IMAGE="gcr.io/${GCP_PROJECT_ID}/potpie-slack:${{ github.sha }}"
+          docker build --tag $IMAGE .
+          docker push $IMAGE
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: potpie-slack
+          image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/potpie-slack:${{ github.sha }}
+          region: ${{ secrets.GCP_REGION }}
+          platform: managed
+          env_vars: |
+            SLACK_SIGNING_SECRET=${{ secrets.SLACK_SIGNING_SECRET }}
+            SLACK_CLIENT_ID=${{ secrets.SLACK_CLIENT_ID }}
+            SLACK_CLIENT_SECRET=${{ secrets.SLACK_CLIENT_SECRET }}
+            POTPIE_HOST=${{ secrets.POTPIE_HOST }}
+            POSTGRES_SERVER=${{ secrets.POSTGRES_SERVER }}

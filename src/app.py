@@ -64,7 +64,7 @@ def build_app(
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"Welcome to Potpie AI, <@{user_id}>! 9B19",
+                        "text": f"Welcome to Potpie AI, <@{user_id}>! \uf8ffüéâ",
                     },
                 },
                 {
@@ -209,6 +209,46 @@ def build_app(
         # Open the modal
         await client.views_open(trigger_id=body["trigger_id"], view=modal)
 
+    @app.command("/parse-repo")
+    async def command_parse_repo(ack, body, client):
+        await ack()  # Acknowledge the command
+        
+        # Define the modal view with an input field for GitHub repo URL
+        modal = {
+            "type": "modal",
+            "callback_id": "repo_modal",
+            "title": {"type": "plain_text", "text": "Parse Repository"},
+            "blocks": [
+                {
+                    "type": "input",
+                    "block_id": "repo_url_input_block",
+                    "label": {
+                        "type": "plain_text",
+                        "text": "GitHub Repository URL",
+                    },
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "repo_url_input",
+                        "placeholder": {"type": "plain_text", "text": "Enter GitHub repository URL"},
+                    },
+                }
+            ],
+            "submit": {"type": "plain_text", "text": "Submit"},
+        }
+
+        # Open the modal
+        await client.views_open(trigger_id=body["trigger_id"], view=modal)
+    
+    @app.view("repo_modal")
+    async def handle_repo_modal_submission(ack, body, view):
+        await ack()  # Acknowledge the view submission
+        
+        # Extract the repository URL from the submitted form
+        repo_url = view["state"]["values"]["repo_url_input_block"]["repo_url_input"]["value"]
+        
+        # For now, just print the URL
+        print(f"Received GitHub repository URL: {repo_url}")
+
     @app.view("handle_authentication")
     async def handle_authentication(ack, body, client):
         await ack()  # Acknowledge the command
@@ -228,7 +268,7 @@ def build_app(
             # Send the direct message
             await client.chat_postMessage(
                 channel=channel_id,
-                text="*You have been Authenticated Successfully!!*\n\n1919 use `/potpie` command to start a conversation\n",
+                text="*You have been Authenticated Successfully!!*\\n\\n‚Ä¢ use `/potpie` command to start a conversation\\n",
             )
         except Exception as e:
             print(f"Error sending DM: {e}")
@@ -402,7 +442,7 @@ def build_app(
             # Send the direct message
             res = await client.chat_postMessage(
                 channel=channel_id,
-                text=f"9B Project: *{project_name}* \n94 Agent: *{agent_name}*  \n\n> _ AF{query} AF_  9B",
+                text=f"\uf8ffüìÅ Project: *{project_name}* \\n\uf8ffü§ñ Agent: *{agent_name}*  \\n\\n> _‚Äú{query}‚Äù_  \uf8ffüîç",
             )
 
             await conversation_mapping_store.set_mapping(res.data["ts"], conv)
@@ -452,7 +492,7 @@ def build_app(
             await client.chat_postMessage(
                 channel=channel_id,
                 text=converter.convert(ans)
-                + "\nYou can *@mention* me to continue the conversation",
+                + "\\nYou can *@mention* me to continue the conversation",
                 thread_ts=thread_id,
             )
 

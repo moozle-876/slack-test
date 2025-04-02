@@ -64,7 +64,7 @@ def build_app(
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"Welcome to Potpie AI, <@{user_id}>! üéâ",
+                        "text": f"Welcome to Potpie AI, <@{user_id}>! 9B19",
                     },
                 },
                 {
@@ -228,7 +228,7 @@ def build_app(
             # Send the direct message
             await client.chat_postMessage(
                 channel=channel_id,
-                text="*You have been Authenticated Successfully!!*\n\n‚Ä¢ use `/potpie` command to start a conversation\n",
+                text="*You have been Authenticated Successfully!!*\n\n1919 use `/potpie` command to start a conversation\n",
             )
         except Exception as e:
             print(f"Error sending DM: {e}")
@@ -402,7 +402,7 @@ def build_app(
             # Send the direct message
             res = await client.chat_postMessage(
                 channel=channel_id,
-                text=f"üìÅ Project: *{project_name}* \nü§ñ Agent: *{agent_name}*  \n\n> _‚Äú{query}‚Äù_  üîç",
+                text=f"9B Project: *{project_name}* \n94 Agent: *{agent_name}*  \n\n> _ AF{query} AF_  9B",
             )
 
             await conversation_mapping_store.set_mapping(res.data["ts"], conv)
@@ -469,23 +469,6 @@ def build_app(
                 channel=channel_id,
                 thread_ts=thread_id,
                 text="Error processing your request. Please try again later",
-            )
-
-    @app.command("/parse-repo")
-    async def command_parse_repo(ack, body, client):
-        await ack()  # Acknowledge the command
-        user_id = body['user_id']
-        channel_id = body['channel_id']
-        try:
-            await client.chat_postMessage(
-                channel=channel_id,
-                text=f"Starting to parse the repository for user <@{user_id}>... \nPlease wait for a moment!"
-            )
-            # Implement parsing logic here
-        except Exception as e:
-            await client.chat_postMessage(
-                channel=channel_id,
-                text=f"Error occurred while parsing the repository: {str(e)}"
             )
 
     return app

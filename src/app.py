@@ -64,7 +64,7 @@ def build_app(
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"Welcome to Potpie AI, <@{user_id}>! 🎉",
+                        "text": f"Welcome to Potpie AI, <@{user_id}>! \uf8ffüéâ",
                     },
                 },
                 {
@@ -228,10 +228,91 @@ def build_app(
             # Send the direct message
             await client.chat_postMessage(
                 channel=channel_id,
-                text="*You have been Authenticated Successfully!!*\n\n• use `/potpie` command to start a conversation\n",
+                text="*You have been Authenticated Successfully!!*\\n\\n‚Ä¢ use `/potpie` command to start a conversation\\n",
             )
         except Exception as e:
             print(f"Error sending DM: {e}")
+
+    @app.command("/parse-repo")
+    async def parse_repo(ack, body, client, logger):
+        await ack()  # Acknowledge the command
+        channel_id = body["channel_id"]
+        
+        # Define the modal view with an input field for GitHub URL
+        modal = {
+            "type": "modal",
+            "callback_id": "handle_parse_repo",
+            "title": {"type": "plain_text", "text": "Parse Repository"},
+            "private_metadata": channel_id,
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "Enter a GitHub repository URL to parse and analyze.",
+                    },
+                },
+                {
+                    "type": "input",
+                    "block_id": "github_url_input",
+                    "label": {
+                        "type": "plain_text",
+                        "text": "GitHub Repository URL",
+                    },
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "github_url",
+                        "placeholder": {
+                            "type": "plain_text", 
+                            "text": "https://github.com/username/repository"
+                        },
+                    },
+                }
+            ],
+            "submit": {"type": "plain_text", "text": "Parse"},
+        }
+
+        # Open the modal
+        await client.views_open(trigger_id=body["trigger_id"], view=modal)
+
+    @app.view("handle_parse_repo")
+    async def handle_parse_repo(ack, body, client):
+        await ack()  # Acknowledge the submission
+
+        try:
+            team_id = body["team"]["id"]
+            
+            # Auth Guard
+            potpie_token = await token_store.get_token(team_id)
+            if potpie_token is None:
+                await client.chat_postEphemeral(
+                    channel=body["view"]["private_metadata"],
+                    user=body["user"]["id"],
+                    text="You haven't authenticated yet! Please use `/authenticate` command first.",
+                )
+                return
+                
+            github_url = body["view"]["state"]["values"]["github_url_input"][
+                "github_url"
+            ]["value"]
+            
+            channel_id = body["view"]["private_metadata"]
+            
+            # For now, just print the URL the user provided
+            await client.chat_postMessage(
+                channel=channel_id,
+                text=f"*Repository URL received:* {github_url}\n\nParsing functionality will be implemented in a future update.",
+            )
+            
+            logging.info(f"Repository URL received: {github_url}")
+            
+        except Exception as e:
+            logging.error(f"Error handling repository parsing: {e}")
+            await client.chat_postEphemeral(
+                channel=body["view"]["private_metadata"],
+                user=body["user"]["id"],
+                text="An error occurred while processing your request. Please try again later.",
+            )
 
     @app.command("/potpie")
     async def start_conversation(ack, body, client, logger):
@@ -402,7 +483,7 @@ def build_app(
             # Send the direct message
             res = await client.chat_postMessage(
                 channel=channel_id,
-                text=f"📁 Project: *{project_name}* \n🤖 Agent: *{agent_name}*  \n\n> _“{query}”_  🔍",
+                text=f"\uf8ffüìÅ Project: *{project_name}* \\n\uf8ffü§ñ Agent: *{agent_name}*  \\n\\n> _‚Äú{query}‚Äù_  \uf8ffüîç",
             )
 
             await conversation_mapping_store.set_mapping(res.data["ts"], conv)
@@ -452,7 +533,7 @@ def build_app(
             await client.chat_postMessage(
                 channel=channel_id,
                 text=converter.convert(ans)
-                + "\nYou can *@mention* me to continue the conversation",
+                + "\\nYou can *@mention* me to continue the conversation",
                 thread_ts=thread_id,
             )
 

@@ -15,7 +15,10 @@ from store import (
 )
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 
 def build_app(
@@ -64,7 +67,7 @@ def build_app(
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"Welcome to Potpie AI, <@{user_id}>! 🎉",
+                        "text": f"Welcome to Potpie AI, <@{user_id}>! üéâ",
                     },
                 },
                 {
@@ -228,10 +231,10 @@ def build_app(
             # Send the direct message
             await client.chat_postMessage(
                 channel=channel_id,
-                text="*You have been Authenticated Successfully!!*\n\n• use `/potpie` command to start a conversation\n",
+                text="*You have been Authenticated Successfully!!*\n\n‚Ä¢ use `/potpie` command to start a conversation\n",
             )
         except Exception as e:
-            print(f"Error sending DM: {e}")
+            logging.error(f"Error sending DM: {e}")
 
     @app.command("/potpie")
     async def start_conversation(ack, body, client, logger):
@@ -402,7 +405,7 @@ def build_app(
             # Send the direct message
             res = await client.chat_postMessage(
                 channel=channel_id,
-                text=f"📁 Project: *{project_name}* \n🤖 Agent: *{agent_name}*  \n\n> _“{query}”_  🔍",
+                text=f"üìÅ Project: *{project_name}* \nü§ñ Agent: *{agent_name}*  \n\n> _‚Äú{query}‚Äù_  üîç",
             )
 
             await conversation_mapping_store.set_mapping(res.data["ts"], conv)
